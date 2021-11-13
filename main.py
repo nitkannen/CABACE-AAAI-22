@@ -33,22 +33,45 @@ from transformers import get_linear_schedule_with_warmup
 from transformers import DataCollatorForTokenClassification
 from transformers import BertPreTrainedModel
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, AutoConfig, AutoModel
+import argparse
+from modelling import Simple_BERT
+
+
+def random_seed(seed_value, use_cuda):
+
+    np.random.seed(seed_value)  
+    torch.manual_seed(seed_value)  
+    random.seed(seed_value)
+    if use_cuda:
+        torch.cuda.manual_seed(seed_value)
+        torch.cuda.manual_seed_all(seed_value)  
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+def custom_print(*msg):
+    
+    for i in range(0, len(msg)):
+        if i == len(msg) - 1:
+            print(msg[i])
+            logger.write(str(msg[i]) + '\n')
+        else:
+            print(msg[i], ' ', end='')
+            logger.write(str(msg[i]))
 
 class Instructor():
+
     def __init__(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size):
+
         self.preprocessor = Preprocessor(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size)
+
+        self.train_data_path = train_data_path
+        self.eval_data_path = eval_data_path
         
 
 
-    def custom_print(*msg):
+    
 
-        for i in range(0, len(msg)):
-            if i == len(msg) - 1:
-                print(msg[i])
-                logger.write(str(msg[i]) + '\n')
-            else:
-                print(msg[i], ' ', end='')
-                logger.write(str(msg[i]))
+    
 
     def token_to_span_map(tokens, char_to_token_index):
         
@@ -128,14 +151,14 @@ class Instructor():
         f1_macro = 2*precision_macro*recall_macro/(precision_macro+recall_macro) if precision_macro+recall_macro > 0 else 0
 
         if verbos:
-            print('Shorts: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(prec_short, recall_short, f1_short))
-            print('Longs: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(prec_long, recall_long, f1_long))
-            print('micro scores: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(precision_micro, recall_micro, f1_micro))
-            print('macro scores: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(precision_macro, recall_macro, f1_macro))
+            custom_print('Shorts: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(prec_short, recall_short, f1_short))
+            custom_print('Longs: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(prec_long, recall_long, f1_long))
+            custom_print('micro scores: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(precision_micro, recall_micro, f1_micro))
+            custom_print('macro scores: P: {:.2%}, R: {:.2%}, F1: {:.2%}'.format(precision_macro, recall_macro, f1_macro))
 
         return precision_macro, recall_macro, f1_macro
 
-    def evaluate_classifier(test_dataloader, model, dataset, tokenizer, eval_data_path):
+    def evaluate_classifier(test_dataloader, model, dataset_, tokenizer, eval_data_path):
         
         model.eval()
         # y_preds, y_test = np.array([]), np.array([])
@@ -165,14 +188,14 @@ class Instructor():
 
         val_predictions = []
 
-        print("Starting preparation of output json........")
+        custom_print("Starting preparation of output json........")
 
 
         
-        for i in range(len(dataset['validation'])):
+        for i in range(len(dataset_)):
 
             output_dict = {}
-            sample = dataset['validation'][i]
+            sample = dataset_[i]
             sample['text'] = sample['text'].replace('—', '-')
             output_dict['text'] = sample['text']
             tokens = tokenizer(sample['text'], return_offsets_mapping=True)
@@ -189,8 +212,9 @@ class Instructor():
         
 
 
-        with open('val_output.json', 'w') as f:
+        with open(trg_folder + str(model_id) + 'val_output.json', 'w') as f:
             json.dump(val_predictions, f, indent = 4)
+
         with open(eval_data_path) as file:
             gold = dict([(d['ID'], {'acronyms':d['acronyms'],'long-forms':d['long-forms']}) for d in json.load(file)])
         
@@ -213,6 +237,7 @@ class Instructor():
         return optimizer_grouped_parameters
 
     def get_optimizer_scheduler(model, train_dataloader):
+
         total_steps = len(train_dataloader) * num_train_epochs
         optimizer_grouped_parameters = self.get_optimizer_grouped_parameters(model)
         optimizer = AdamW(optimizer_grouped_parameters, lr=2e-5, eps = 1e-8)
@@ -226,12 +251,70 @@ class Instructor():
 
         torch.save(model.state_dict(), 'best_model.pt')
 
-    """def get_model(model_id):
-        if model_id == 1:
-            return Seq2SeqModel()
-        if mde_id == 2:"""
+    def get_model(model_id):
 
-    def train():
+        if model_id == 1:
+            return Simple_BERT()
+        if model_id == 2:
+            return Transform_CharacterBERT()
+        if model_id == 3:
+            return TwoStepAttention()
+
+    def train(model, optimizer, scheduler):
+
+        best_macro_f1_val = -1
+
+        for epoch in range(num_train_epochs):
+            custom_print("Epoch: " + str(epoch + 1) + ' $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+            accumulated_loss = 0
+            model.train()
+            for step, batch in tqdm.tqdm(enumerate(self.preprocessor.train_dataloader), total=len(self.preprocessor.train_dataloader)):
+            
+            #   print("Starting step :------------------", step)
+                b_input_ids=batch['input_ids'].long().to('cuda')
+                b_attn_mask=batch['attention_mask'].long().to('cuda')
+                b_labels = batch['labels'].long().to('cuda')
+
+                outputs = model(input_ids = b_input_ids, attn_mask = b_attn_mask, labels = b_labels)
+
+                loss = outputs[1]
+
+                accumulated_loss += loss.item()
+
+                optimizer.zero_grad()
+                loss.backward()
+
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+
+                optimizer.step()
+                scheduler.step()
+
+            custom_print("Loss on Train Data ...  ", accumulated_loss)
+
+
+            custom_print("Running Eval on Validation Data after Epoch ............................., ", str(epoch + 1))
+            evalP, evalR, evalF = self.evaluate_classifier(self.preprocessor.eval_dataloder, model, self.preprocessor.eval_dataset_raw , self.preprocessor.tokenizer, self.eval_data_path )
+            
+            custom_print("Validation Results #########################: P{}   R{}    F{} after Epoch {}".format( evalP, evalR, evalF, str(epoch + 1)))
+            
+            
+            
+            
+            if evalF > best_macro_f1_val:         
+
+                best_macro_f1_val = evalF   
+
+                self.evaluate_classifier(testoder, model, test_raw, tokenizer, eval_datapath)
+
+                self.save_bert_model(model)
+
+            
+        custom_print("Done!")
+
+        custom_print("\n\n")
+        
+
+
 
 
     
@@ -242,6 +325,8 @@ class Instructor():
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+
     parser.add_argument('--gpu_id', type=int, default=0)
 	parser.add_argument('--seed', type=int, default=42)
 	parser.add_argument('--src_folder', type=str, default="data/")
@@ -250,4 +335,32 @@ if __name__ == "__main__":
 	parser.add_argument('--model_type', type=str, default="0")
 	parser.add_argument('--batch_size', type=int, default=16)
 	parser.add_argument('--epoch', type=int, default=6)
+    parser.add_argument('--seed_value', type = int, default = 42)
+    parser.add_argument('--use_LM', type = int, default = 0)
+
+    args = parser.parse_args()
+
+    seed_value = args.seed_value
+    num_train_epochs = args.epoch
+    src_folder = args.src_folder
+    trg_folder = args.trg_folder
+
+    ins = Instructor()
+    logger = open(os.path.join(trg_folder, 'training.log'), 'w')
+
+
+    model = ins.get_model(args.model_id)
+    
+    use_cuda = torch.cuda.is_available()
+    random_seed(seed_value)
+
+    
+    optimizer, scheduler = ins.get_optimizer_scheduler(model, ins.preprocessor.train_dataloder)
+
+    ins.train(optimizer, scheduler)
+
+    logger.close()
+
+
+    
 

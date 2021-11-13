@@ -20,8 +20,27 @@ class Preprocessor():
         self.batch_size = batch_size
         self.train_dataloader = self.read_data(train_data_path, True)
         self.eval_dataloader = self.read_data(eval_data_path, False)
+        self.train_dataset_raw = self.return_dataset(train_data_path)
+        self.eval_dataset_raw = self.return_dataset(eval_data_path)
+
+    def return_dataset(datapath):
+
+        with open(datapath, 'r') as f1: 
+            data = json.load(f1)
+        for val in data:
+            del(val['ID'])
+
+        df_raw = pd.DataFrame(data)
+        df_raw['text'] = df_raw['text'].apply(lambda x: x.replace("’", "'").replace("’", "'"))
+
+        df_raw.to_csv('train.csv', index = False)
+
+        dataset = load_dataset('csv', data_files={ 'train':'train.csv'})
+        #bert_dataset = dataset.map(self.create_BERT_inputs, batched = True)
+        return dataset
 
     def read_data(datapath, is_train = False):
+
         with open(datapath, 'r') as f1: 
             data = json.load(f1)
         for val in data:
@@ -51,6 +70,7 @@ class Preprocessor():
                     )
 
     def return_label2id():
+
         label_to_index = {}
         label_to_index['O'] = 0
         label_to_index['B-SHORT'] = 1
