@@ -208,13 +208,13 @@ class Instructor():
         
 
 
-        with open(os.path.join(trg_folder, str(model_id), 'val_output.json'), 'w') as f:
+        with open(os.path.join(trg_folder, 'val_output.json'), 'w') as f:
             json.dump(val_predictions, f, indent = 4)
 
         with open(eval_data_path) as file:
             gold = dict([(d['ID'], {'acronyms':d['acronyms'],'long-forms':d['long-forms']}) for d in json.load(file)])
         
-        with open('val_output.json') as file:
+        with open(os.path.join(trg_folder, 'val_output.json')) as file:
             pred = dict([(d['ID'], {'acronyms':d['acronyms'],'long-forms':d['long-forms']}) for d in json.load(file)])
         
         pred = [pred[k] for k,v in gold.items()]
