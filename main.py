@@ -359,7 +359,7 @@ if __name__ == "__main__":
     train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
     eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
 
-    ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, args )
+    ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs )
     logger = open(os.path.join(trg_folder, 'training.log'), 'w')
     model_id = args.model_id
 
