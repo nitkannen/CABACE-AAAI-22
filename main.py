@@ -256,7 +256,7 @@ class Instructor():
         return model
 
     def get_model(self,model_id):
-
+        print(model_id)
         if model_id == 0:
             return Simple_BERT(self.preprocessor.config, model_checkpoint)
         if model_id == 1:
