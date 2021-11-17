@@ -23,7 +23,7 @@ class Preprocessor():
         self.train_dataset_raw = self.return_dataset(train_data_path)
         self.eval_dataset_raw = self.return_dataset(eval_data_path)
 
-    def return_dataset(datapath):
+    def return_dataset(self,datapath):
 
         with open(datapath, 'r') as f1: 
             data = json.load(f1)
@@ -39,7 +39,7 @@ class Preprocessor():
         #bert_dataset = dataset.map(self.create_BERT_inputs, batched = True)
         return dataset
 
-    def read_data(datapath, is_train = False):
+    def read_data(self,datapath, is_train = False):
 
         with open(datapath, 'r') as f1: 
             data = json.load(f1)
@@ -57,7 +57,7 @@ class Preprocessor():
 
 
 
-    def get_dataloader(is_train, bert_dataset):
+    def get_dataloader(self,is_train, bert_dataset):
 
         if is_train:
             return DataLoader(
@@ -69,7 +69,7 @@ class Preprocessor():
                     bert_dataset['train'], collate_fn = self.data_collator, batch_size=self.batch_size
                     )
 
-    def return_label2id():
+    def return_label2id(self):
 
         label_to_index = {}
         label_to_index['O'] = 0
@@ -79,7 +79,7 @@ class Preprocessor():
         label_to_index['I-LONG'] = 4 
         return label_to_index 
 
-    def fill_acronym_tags(acronyms,text,target, tokens):
+    def fill_acronym_tags(self,acronyms,text,target, tokens):
           
         acronyms_span_list = literal_eval(acronyms)
 
@@ -103,7 +103,7 @@ class Preprocessor():
 
         return target
 
-    def fill_long_form_tags(long_forms,text, target, tokens):
+    def fill_long_form_tags(self,long_forms,text, target, tokens):
         
         long_forms_list = literal_eval(long_forms)
 
@@ -126,7 +126,7 @@ class Preprocessor():
 
         return target
 
-    def create_BERT_inputs(example):
+    def create_BERT_inputs(self,example):
     
         new_dict = {}
 

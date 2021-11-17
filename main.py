@@ -69,7 +69,7 @@ class Instructor():
         
 
 
-    def token_to_span_map(tokens, char_to_token_index):
+    def token_to_span_map(self,tokens, char_to_token_index):
         
         token_to_span_map = [[0, 0] for idx in range(len(tokens))]
 
@@ -83,7 +83,7 @@ class Instructor():
 
         return token_to_span_map
 
-    def get_prediction_index(ans_labels, span_map):
+    def get_prediction_index(self,ans_labels, span_map):
         
         acronyms = []
         long_forms = []
@@ -111,7 +111,7 @@ class Instructor():
 
         return acronyms, long_forms
 
-    def score_phrase_level(key, predictions, verbos=False):
+    def score_phrase_level(self,key, predictions, verbos=False):
         gold_shorts = set()
         gold_longs = set()
         pred_shorts = set()
@@ -154,7 +154,7 @@ class Instructor():
 
         return precision_macro, recall_macro, f1_macro
 
-    def evaluate_classifier(test_dataloader, model, dataset_, tokenizer, eval_data_path):
+    def evaluate_classifier(self,test_dataloader, model, dataset_, tokenizer, eval_data_path):
         
         model.eval()
         # y_preds, y_test = np.array([]), np.array([])
@@ -223,7 +223,7 @@ class Instructor():
         
         return p, r, f1
 
-    def get_optimizer_grouped_parameters(model):
+    def get_optimizer_grouped_parameters(self,model):
         param_optimizer = list(model.named_parameters())
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
@@ -232,7 +232,7 @@ class Instructor():
         ]
         return optimizer_grouped_parameters
 
-    def get_optimizer_scheduler(model, train_dataloader):
+    def get_optimizer_scheduler(self,model, train_dataloader):
 
         total_steps = len(train_dataloader) * num_train_epochs
         optimizer_grouped_parameters = self.get_optimizer_grouped_parameters(model)
@@ -243,11 +243,11 @@ class Instructor():
 
         return optimizer, scheduler
 
-    def save_bert_model(model):
+    def save_bert_model(self,model):
 
         torch.save(model.state_dict(), 'best_model.pt')
 
-    def load_model(new_checkpoint):
+    def load_model(self,new_checkpoint):
         model = self.get_model(model_id)
         model.to('cuda')
         model.load_state_dict(torch.load(new_checkpoint))
@@ -255,7 +255,7 @@ class Instructor():
 
         return model
 
-    def get_model(model_id):
+    def get_model(self,model_id):
 
         if model_id == 1:
             return Simple_BERT(self.preprocessor.config, model_checkpoint)
@@ -264,7 +264,7 @@ class Instructor():
         # if model_id == 3:
         #     return TwoStepAttention()
 
-    def train(model, optimizer, scheduler):
+    def train(self, model, optimizer, scheduler):
 
         best_macro_f1_val = -1
 
@@ -337,7 +337,7 @@ if __name__ == "__main__":
     parser.add_argument('--src_folder', type=str, default="data/")
     parser.add_argument('--trg_folder', type=str, default="logs/")
     parser.add_argument('--job_mode', type=str, default="train")
-    parser.add_argument('--model_id', type=str, default="0")
+    parser.add_argument('--model_id', type=str, default="0") ##needed
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--epoch', type=int, default=6) ##needed
     parser.add_argument('--seed_value', type = int, default = 42)
