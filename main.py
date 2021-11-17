@@ -1,6 +1,7 @@
 import datetime
 import json
 import math
+import sys
 import os
 import random
 import time
@@ -301,7 +302,7 @@ class Instructor():
             
             custom_print("Validation Results #########################: P{}   R{}    F{} after Epoch {}".format( evalP, evalR, evalF, str(epoch + 1)))
             
-            
+            custom_print('\n')
             
             
             if evalF > best_macro_f1_val:         
@@ -362,6 +363,10 @@ if __name__ == "__main__":
     ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs )
 
     logger = open(os.path.join(trg_folder, 'training.log'), 'w')
+    custom_print(sys.argv)
+    custom_print('\n')
+
+
     model_id = args.model_id
 
     model = ins.get_model(model_id)
