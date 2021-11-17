@@ -135,8 +135,8 @@ class Preprocessor():
         for i in range(len(tokenized_input['input_ids'])):
         #print(example['text'])
             target = ['O' for k in range(len(tokenized_input['input_ids'][i]) - 2)]
-            target = self.fill_acronym_tags(example['acronyms'][i], example['text'][i], target, tokenizer.convert_ids_to_tokens(tokenized_input['input_ids'][i][1:-1]))
-            target = self.fill_long_form_tags(example['long-forms'][i], example['text'][i], target, tokenizer.convert_ids_to_tokens(tokenized_input['input_ids'][i][1:-1]))
+            target = self.fill_acronym_tags(example['acronyms'][i], example['text'][i], target, self.tokenizer.convert_ids_to_tokens(tokenized_input['input_ids'][i][1:-1]))
+            target = self.fill_long_form_tags(example['long-forms'][i], example['text'][i], target, self.tokenizer.convert_ids_to_tokens(tokenized_input['input_ids'][i][1:-1]))
             target = [self.label_to_index[i] for i in target]
             target = [-100] + target
             target.append(-100)
