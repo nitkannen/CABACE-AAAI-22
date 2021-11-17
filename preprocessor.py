@@ -20,8 +20,8 @@ class Preprocessor():
         self.batch_size = batch_size
         self.train_dataloader = self.read_data(train_data_path, True)
         self.eval_dataloader = self.read_data(eval_data_path, False)
-        self.train_dataset_raw = self.return_dataset(train_data_path)
-        self.eval_dataset_raw = self.return_dataset(eval_data_path)
+        self.train_dataset_raw = self.return_dataset(train_data_path)['train']
+        self.eval_dataset_raw = self.return_dataset(eval_data_path)['train']
 
     def return_dataset(self,datapath):
 
