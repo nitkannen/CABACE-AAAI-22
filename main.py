@@ -337,7 +337,7 @@ if __name__ == "__main__":
     parser.add_argument('--src_folder', type=str, default="data/")
     parser.add_argument('--trg_folder', type=str, default="logs/")
     parser.add_argument('--job_mode', type=str, default="train")
-    parser.add_argument('--model_id', type=str, default="0") ##needed
+    parser.add_argument('--model_id', type=int, default=0) ##needed
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--epoch', type=int, default=6) ##needed
     parser.add_argument('--seed_value', type = int, default = 42)
