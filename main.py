@@ -302,7 +302,7 @@ class Instructor():
             
             custom_print("Validation Results #########################: P{}   R{}    F{} after Epoch {}".format( evalP, evalR, evalF, str(epoch + 1)))
             
-            custom_print('\n')
+            
             
             
             if evalF > best_macro_f1_val:         
@@ -314,6 +314,8 @@ class Instructor():
 
 
                 self.save_bert_model(model)
+                
+            custom_print('\n')
 
             
         custom_print("Done!")
@@ -345,6 +347,7 @@ if __name__ == "__main__":
     parser.add_argument('--tokenizer_checkpoint', type = str, default = '') ##needed
     parser.add_argument('--model_checkpoint', type = str, default='') ##needed
     parser.add_argument('--dataset', type = str, default = 'english/legal') ##needed
+    parser.add_argument('--log_file', type = str, default = 'training.log')
 
     args = parser.parse_args()
 
@@ -356,13 +359,14 @@ if __name__ == "__main__":
     model_checkpoint = args.model_checkpoint
     bs = args.batch_size
     dataset_folder = args.dataset
+    log_file = args.log_file
 
     train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
     eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
 
     ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs )
 
-    logger = open(os.path.join(trg_folder, 'training.log'), 'w')
+    logger = open(os.path.join(trg_folder, log_file), 'w')
     custom_print(sys.argv)
     custom_print('\n')
 
