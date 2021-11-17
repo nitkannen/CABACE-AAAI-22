@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 
 class Preprocessor():
 
-    def __init__(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size):
+    def __init__(self, tokenizer_checkpoint, train_data_path, eval_data_path, batch_size):
         
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_checkpoint)
         self.config = AutoConfig.from_pretrained(tokenizer_checkpoint) 

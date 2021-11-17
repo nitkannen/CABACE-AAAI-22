@@ -34,7 +34,7 @@ from transformers import DataCollatorForTokenClassification
 from transformers import BertPreTrainedModel
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, AutoConfig, AutoModel
 import argparse
-from modelling import Simple_BERT
+from modelling import *
 
 
 def random_seed(seed_value, use_cuda):
@@ -60,7 +60,7 @@ def custom_print(*msg):
 
 class Instructor():
 
-    def __init__(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size):
+    def __init__(self, tokenizer_checkpoint, train_data_path, eval_data_path, batch_size):
 
         self.preprocessor = Preprocessor(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size)
 
@@ -68,10 +68,6 @@ class Instructor():
         self.eval_data_path = eval_data_path
         
 
-
-    
-
-    
 
     def token_to_span_map(tokens, char_to_token_index):
         
@@ -198,7 +194,7 @@ class Instructor():
             sample = dataset_[i]
             sample['text'] = sample['text'].replace('—', '-')
             output_dict['text'] = sample['text']
-            tokens = tokenizer(sample['text'], return_offsets_mapping=True)
+            tokens = self.preprocessor.tokenizer(sample['text'], return_offsets_mapping=True)
 
             
             ans_labels = all_preds[i]
@@ -212,7 +208,7 @@ class Instructor():
         
 
 
-        with open(trg_folder + str(model_id) + 'val_output.json', 'w') as f:
+        with open(os.path.join(trg_folder, str(model_id), 'val_output.json'), 'w') as f:
             json.dump(val_predictions, f, indent = 4)
 
         with open(eval_data_path) as file:
@@ -251,14 +247,22 @@ class Instructor():
 
         torch.save(model.state_dict(), 'best_model.pt')
 
+    def load_model(new_checkpoint):
+        model = self.get_model(model_id)
+        model.to('cuda')
+        model.load_state_dict(torch.load(new_checkpoint))
+        model.eval()
+
+        return model
+
     def get_model(model_id):
 
         if model_id == 1:
-            return Simple_BERT()
+            return Simple_BERT(self.preprocessor.config, model_checkpoint)
         if model_id == 2:
-            return Transform_CharacterBERT()
-        if model_id == 3:
-            return TwoStepAttention()
+            return Transform_CharacterBERT(self.preprocessor.config, model_checkpoint)
+        # if model_id == 3:
+        #     return TwoStepAttention()
 
     def train(model, optimizer, scheduler):
 
@@ -293,7 +297,7 @@ class Instructor():
 
 
             custom_print("Running Eval on Validation Data after Epoch ............................., ", str(epoch + 1))
-            evalP, evalR, evalF = self.evaluate_classifier(self.preprocessor.eval_dataloder, model, self.preprocessor.eval_dataset_raw , self.preprocessor.tokenizer, self.eval_data_path )
+            evalP, evalR, evalF = self.evaluate_classifier(self.preprocessor.eval_dataloader, model, self.preprocessor.eval_dataset_raw , self.preprocessor.tokenizer, self.eval_data_path )
             
             custom_print("Validation Results #########################: P{}   R{}    F{} after Epoch {}".format( evalP, evalR, evalF, str(epoch + 1)))
             
@@ -304,7 +308,9 @@ class Instructor():
 
                 best_macro_f1_val = evalF   
 
-                self.evaluate_classifier(testoder, model, test_raw, tokenizer, eval_datapath)
+                evalP, evalR, evalF = self.evaluate_classifier(self.preprocessor.eval_dataloader, model, self.preprocessor.eval_dataset_raw, self.preprocessor.tokenizer, self.eval_data_path)
+
+
 
                 self.save_bert_model(model)
 
@@ -328,15 +334,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--gpu_id', type=int, default=0)
-	parser.add_argument('--seed', type=int, default=42)
-	parser.add_argument('--src_folder', type=str, default="data/")
-	parser.add_argument('--trg_folder', type=str, default="logs/")
-	parser.add_argument('--job_mode', type=str, default="train")
-	parser.add_argument('--model_type', type=str, default="0")
-	parser.add_argument('--batch_size', type=int, default=16)
-	parser.add_argument('--epoch', type=int, default=6)
+    parser.add_argument('--src_folder', type=str, default="data/")
+    parser.add_argument('--trg_folder', type=str, default="logs/")
+    parser.add_argument('--job_mode', type=str, default="train")
+    parser.add_argument('--model_id', type=str, default="0")
+    parser.add_argument('--batch_size', type=int, default=16)
+    parser.add_argument('--epoch', type=int, default=6) ##needed
     parser.add_argument('--seed_value', type = int, default = 42)
-    parser.add_argument('--use_LM', type = int, default = 0)
+    parser.add_argument('--tokenizer_checkpoint', type = str, default = '') ##needed
+    parser.add_argument('--model_checkpoint', type = str, default='') ##needed
+    parser.add_argument('--dataset', type = str, default = 'english/legal') ##needed
 
     args = parser.parse_args()
 
@@ -344,21 +351,37 @@ if __name__ == "__main__":
     num_train_epochs = args.epoch
     src_folder = args.src_folder
     trg_folder = args.trg_folder
+    tokenizer_checkpoint = args.tokenizer_checkpoint
+    model_checkpoint = args.model_checkpoint
+    bs = args.batch_size
+    dataset_folder = args.dataset
 
-    ins = Instructor()
+    train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
+    eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
+
+    ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, args )
     logger = open(os.path.join(trg_folder, 'training.log'), 'w')
+    model_id = args.model_id
 
-
-    model = ins.get_model(args.model_id)
+    model = ins.get_model(model_id)
+    model = model.to('cuda')
     
     use_cuda = torch.cuda.is_available()
+    
     random_seed(seed_value)
 
     
-    optimizer, scheduler = ins.get_optimizer_scheduler(model, ins.preprocessor.train_dataloder)
+    optimizer, scheduler = ins.get_optimizer_scheduler(model, ins.preprocessor.train_dataloader)
 
     ins.train(optimizer, scheduler)
 
+    custom_print('Evauating the model with the best Val Accuracy........')
+
+    best_model = ins.load_model('best_model.pt')
+    evalP, evalR, evalF = ins.evaluate_classifier(best_model, ins.preprocessor.eval_dataset_raw, ins.preprocessor.tokenizer, eval_data_path)
+    custom_print(evalP, evalR, evalF)
+
+    custom_print("All Done :)")
     logger.close()
 
 
