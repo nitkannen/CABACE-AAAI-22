@@ -257,9 +257,9 @@ class Instructor():
 
     def get_model(self,model_id):
 
-        if model_id == 1:
+        if model_id == 0:
             return Simple_BERT(self.preprocessor.config, model_checkpoint)
-        if model_id == 2:
+        if model_id == 1:
             return Transform_CharacterBERT(self.preprocessor.config, model_checkpoint)
         # if model_id == 3:
         #     return TwoStepAttention()
@@ -360,7 +360,7 @@ if __name__ == "__main__":
     eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
 
     ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs )
-    
+
     logger = open(os.path.join(trg_folder, 'training.log'), 'w')
     model_id = args.model_id
 
