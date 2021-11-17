@@ -369,7 +369,7 @@ if __name__ == "__main__":
     
     use_cuda = torch.cuda.is_available()
     
-    random_seed(seed_value)
+    random_seed(seed_value, use_cuda)
 
     
     optimizer, scheduler = ins.get_optimizer_scheduler(model, ins.preprocessor.train_dataloader)
