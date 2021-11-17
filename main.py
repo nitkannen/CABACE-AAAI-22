@@ -379,7 +379,7 @@ if __name__ == "__main__":
     custom_print('Evauating the model with the best Val Accuracy........')
 
     best_model = ins.load_model('best_model.pt')
-    evalP, evalR, evalF = ins.evaluate_classifier(best_model, ins.preprocessor.eval_dataset_raw, ins.preprocessor.tokenizer, eval_data_path)
+    evalP, evalR, evalF = ins.evaluate_classifier(ins.preprocessor.eval_dataloader, best_model, ins.preprocessor.eval_dataset_raw, ins.preprocessor.tokenizer, eval_data_path)
     custom_print(evalP, evalR, evalF)
 
     custom_print("All Done :)")
