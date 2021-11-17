@@ -374,7 +374,7 @@ if __name__ == "__main__":
     
     optimizer, scheduler = ins.get_optimizer_scheduler(model, ins.preprocessor.train_dataloader)
 
-    ins.train(optimizer, scheduler)
+    ins.train(model, optimizer, scheduler)
 
     custom_print('Evauating the model with the best Val Accuracy........')
 
