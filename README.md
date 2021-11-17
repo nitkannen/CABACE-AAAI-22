@@ -11,7 +11,7 @@ We support different model architectures to solve AE, and they can be identified
 * CharacterTransformBert - 1
 (More models to be added)
 
-To run the code on English Legal dataset using simple BERT for Sequence labelling(model_id = 0) use the command:
+To run the code on English Legal dataset using simple BERT for Sequence labelling(model_id = 0) use:
 
 ```
 python main.py --src_folder data/
