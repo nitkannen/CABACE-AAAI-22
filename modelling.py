@@ -1,6 +1,4 @@
 
-
-
 import torch
 from transformers import BertPreTrainedModel
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, AutoConfig, AutoModel
@@ -15,9 +13,8 @@ class Simple_BERT(BertPreTrainedModel):
         self.criterion = nn.CrossEntropyLoss(ignore_index=-100)
         self.token_dropout = nn.Dropout(0.1)
 
-    def forward(self, input_ids, attn_mask, acronym_labels, longform_labels, labels):
+    def forward(self, input_ids, attn_mask, labels):
         lhs = self.bert(input_ids, attn_mask).last_hidden_state
-        # print("lhs shape", lhs.shape)
         logits = self.classifier(self.token_dropout(lhs))
         ypreds = torch.argmax(self.softmax(logits), dim=2)
         loss = self.criterion(logits.view(-1, 5), labels.view(-1))
