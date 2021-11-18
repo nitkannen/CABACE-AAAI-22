@@ -15,14 +15,14 @@ To run the code on English Legal dataset using simple BERT for Sequence labellin
 
 ```
 python main.py --src_folder data/
-                  --trg_folder logs/
-                  --model_id 0
-                  --seed_value 42
-                  --batch_size 8
-                  --epoch 6
-                  --tokenizer_checkpoint bert-base-cased
-                  --model_checkpoint bert-base-cased
-                  --dataset english/legal
+               --trg_folder logs/
+               --model_id 0
+               --seed_value 42
+               --batch_size 8
+               --epoch 6
+               --tokenizer_checkpoint bert-base-cased
+               --model_checkpoint bert-base-cased
+               --dataset english/legal
      
  ```
 
