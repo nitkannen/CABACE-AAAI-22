@@ -9,6 +9,10 @@ We support different model architectures to solve AE, and they can be identified
 
 * SimpleBert - 0
 * CharacterTransformBert - 1
+* Masking and augmented Loss
+* Seq2Seq
+* Attention staged prediction
+
 (More models to be added)
 
 To run the code on English Legal dataset using simple BERT for Sequence labelling(model_id = 0) use:
