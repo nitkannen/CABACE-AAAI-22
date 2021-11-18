@@ -25,5 +25,31 @@ python main.py --src_folder data/
                --dataset english/legal
      
  ```
+ 
+ To run the code on English Legal dataset using CharacterTransformBert for Sequence labelling(model_id = 1) use:
+ 
+ * 1) Download and unzip fastText Word Vectors in the root directory using the following commands:
+  ``` 
+  wget https://dl.fbaipublicfiles.com/fasttext/vectors-english/wiki-news-300d-1M.vec.zip  
+  ```
+  ```
+  unzip wiki-news-300d-1M.vec.zip
+  ```
+ * 2) Now use the command to run code:
+
+```
+python main.py --src_folder data/
+               --trg_folder logs/
+               --model_id 1
+               --seed_value 42
+               --batch_size 8
+               --epoch 6
+               --tokenizer_checkpoint bert-base-cased
+               --model_checkpoint bert-base-cased
+               --dataset english/legal
+               --max_word_len 16
+               --cnn_filter_size 4
+     
+ ```
 
 
