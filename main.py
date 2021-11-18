@@ -36,6 +36,7 @@ from transformers import BertPreTrainedModel
 from transformers import AutoModelForTokenClassification, TrainingArguments, Trainer, AutoConfig, AutoModel
 import argparse
 from modelling import *
+from utils.character_utils import get_embed_matrix_and_vocab
 
 
 def random_seed(seed_value, use_cuda):
@@ -257,13 +258,25 @@ class Instructor():
         return model
 
     def get_model(self,model_id):
+
         print(model_id)
+
         if model_id == 0:
             return Simple_BERT(self.preprocessor.config, model_checkpoint)
+
         if model_id == 1:
-            return Transform_CharacterBERT(self.preprocessor.config, model_checkpoint)
+
+            char_vocab, embed_matrix = get_embed_matrix_and_vocab(self.preprocessor.eval_dataset_raw, 
+                                                                    self.preprocessor.train_dataset_raw,
+                                                                    self.preprocessor.tokenizer)
+            return Transform_CharacterBERT(self.preprocessor.config, model_checkpoint, char_vocab, 
+                                            embed_matrix, self.preprocessor.tokenizer, max_word_len, conv_filter_size)
         # if model_id == 3:
         #     return TwoStepAttention()
+
+
+
+
 
     def train(self, model, optimizer, scheduler):
 
@@ -326,12 +339,6 @@ class Instructor():
 
 
 
-    
-
-
-
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -348,6 +355,8 @@ if __name__ == "__main__":
     parser.add_argument('--model_checkpoint', type = str, default='') ##needed
     parser.add_argument('--dataset', type = str, default = 'english/legal') ##needed
     parser.add_argument('--log_file', type = str, default = 'training.log')
+    parser.add_argument('--max_word_len', type = int, default = 16) ### when model_id = 1
+    parser.add_argument('--cnn_filter_size', type = int, default = 4) ## when model_id = 1
 
     args = parser.parse_args()
 
@@ -372,6 +381,9 @@ if __name__ == "__main__":
 
 
     model_id = args.model_id
+    if (model_id == 1):
+        max_word_len = args.max_word_len
+        conv_filter_size = args.cnn_filter_size
 
     model = ins.get_model(model_id)
     model = model.to('cuda')
