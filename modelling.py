@@ -30,7 +30,7 @@ class Transform_CharacterBERT(BertPreTrainedModel):
         self.classifier = nn.Linear(868, 5)
         self.softmax = nn.Softmax(dim=2)
         self.criterion = nn.CrossEntropyLoss(ignore_index=-100)
-        self.char_embeddings = CharEmbeddings(len(char_vocab), 300, embed_matrix,max_word_len, cnn_size, 0.2)
+        self.char_embeddings = CharEmbeddings(len(char_vocab), 300, embed_matrix,max_word_len, cnn_size, 0.1)
         self.token_dropout = nn.Dropout(0.1)
         self.tokenizer = tokenizer
         self.max_word_len = max_word_len
