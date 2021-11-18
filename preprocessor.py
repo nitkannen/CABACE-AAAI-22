@@ -22,6 +22,8 @@ class Preprocessor():
         self.eval_dataloader = self.read_data(eval_data_path, False)
         self.train_dataset_raw = self.return_dataset(train_data_path)['train']
         self.eval_dataset_raw = self.return_dataset(eval_data_path)['train']
+        self.train_bert_dataset = self.return_bert_dataset(train_data_path)['train']
+        self.eval_bert_dataset = self.return_bert_dataset(eval_data_path)['train']
 
     def return_dataset(self,datapath):
 
@@ -38,6 +40,24 @@ class Preprocessor():
         dataset = load_dataset('csv', data_files={ 'train':'train.csv'})
         #bert_dataset = dataset.map(self.create_BERT_inputs, batched = True)
         return dataset
+
+    def return_bert_dataset(self, datapath):
+
+        with open(datapath, 'r') as f1: 
+            data = json.load(f1)
+        for val in data:
+            del(val['ID'])
+        df_raw = pd.DataFrame(data)
+        df_raw['text'] = df_raw['text'].apply(lambda x: x.replace("’", "'").replace("’", "'"))
+
+        df_raw.to_csv('train.csv', index = False)
+
+        dataset = load_dataset('csv', data_files={ 'train':'train.csv'})
+        bert_dataset = dataset.map(self.create_BERT_inputs, batched = True)
+
+        return bert_dataset
+        
+
 
     def read_data(self,datapath, is_train = False):
 

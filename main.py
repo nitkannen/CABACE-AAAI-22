@@ -266,8 +266,8 @@ class Instructor():
 
         if model_id == 1:
 
-            char_vocab, embed_matrix = get_embed_matrix_and_vocab(self.preprocessor.eval_dataset_raw, 
-                                                                    self.preprocessor.train_dataset_raw,
+            char_vocab, embed_matrix = get_embed_matrix_and_vocab(self.preprocessor.eval_bert_dataset, 
+                                                                    self.preprocessor.train_bert_dataset,
                                                                     self.preprocessor.tokenizer)
             return Transform_CharacterBERT(self.preprocessor.config, model_checkpoint, char_vocab, 
                                             embed_matrix, self.preprocessor.tokenizer, max_word_len, conv_filter_size)
