@@ -35,35 +35,36 @@ class Transform_CharacterBERT(BertPreTrainedModel):
         self.tokenizer = tokenizer
         self.max_word_len = max_word_len
         self.conv_filter_size = cnn_size
+        self.char_vocab = char_vocab
     
-    def get_char_seq(self, words, max_len, char_vocab):
+    def get_char_seq(self, words, max_len):
 
         
         char_seq = list()
 
         for i in range(0, self.max_word_len + self.conv_filter_size - 1):  #### CLS
-            char_seq.append(char_vocab['<PAD>'])
+            char_seq.append(self.char_vocab['<PAD>'])
 
         for i in range(0,  self.conv_filter_size - 1):  #### Extra Padding
-            char_seq.append(char_vocab['<PAD>'])
+            char_seq.append(self.char_vocab['<PAD>'])
 
         for word in words:
 
             for c in word[0:min(len(word), self.max_word_len)]:
-                if c in char_vocab:
-                    char_seq.append(char_vocab[c])
+                if c in self.char_vocab:
+                    char_seq.append(self.char_vocab[c])
                 else:
-                    char_seq.append(char_vocab['<UNK>'])
+                    char_seq.append(self.char_vocab['<UNK>'])
             pad_len = self.max_word_len - len(word)
             for i in range(0, pad_len):
-                char_seq.append(char_vocab['<PAD>'])
+                char_seq.append(self.char_vocab['<PAD>'])
             for i in range(0, self.conv_filter_size - 1):
-                char_seq.append(char_vocab['<PAD>'])
+                char_seq.append(self.char_vocab['<PAD>'])
 
         pad_len = max_len - len(words) - 1
         for i in range(0, pad_len):
             for i in range(0, self.max_word_len + self.conv_filter_size - 1):
-                char_seq.append(char_vocab['<PAD>'])
+                char_seq.append(self.char_vocab['<PAD>'])
 
         return char_seq
 
