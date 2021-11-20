@@ -62,13 +62,13 @@ def custom_print(*msg):
 
 class Instructor():
 
-    def __init__(self, tokenizer_checkpoint, train_data_path, eval_data_path, batch_size):
+    def __init__(self, tokenizer_checkpoint, train_data_path, eval_data_path, batch_size, val_output_file):
 
         self.preprocessor = Preprocessor(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size)
 
         self.train_data_path = train_data_path
         self.eval_data_path = eval_data_path
-        
+        self.val_output_file = val_output_file 
 
 
     def token_to_span_map(self,tokens, char_to_token_index):
@@ -210,7 +210,7 @@ class Instructor():
         
 
 
-        with open(os.path.join(trg_folder, 'val_output.json'), 'w') as f:
+        with open(os.path.join(trg_folder, f'{self.val_output_file}.json'), 'w') as f:
             json.dump(val_predictions, f, indent = 4)
 
         with open(eval_data_path) as file:
@@ -360,6 +360,7 @@ if __name__ == "__main__":
     parser.add_argument('--log_file', type = str, default = 'training.log')
     parser.add_argument('--max_word_len', type = int, default = 16) ### when model_id = 1
     parser.add_argument('--cnn_filter_size', type = int, default = 4) ## when model_id = 1
+    parser.add_argument('--val_output_file', type = int, default = 'val_output.json')
 
     args = parser.parse_args()
 
@@ -372,11 +373,12 @@ if __name__ == "__main__":
     bs = args.batch_size
     dataset_folder = args.dataset
     log_file = args.log_file
+    val_output_file = args.val_output_file
 
     train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
     eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
 
-    ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs )
+    ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs, val_output_file)
 
     logger = open(os.path.join(trg_folder, log_file), 'w')
     custom_print(sys.argv)
