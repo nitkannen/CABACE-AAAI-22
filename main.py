@@ -201,7 +201,7 @@ class Instructor():
             
             ans_labels = all_preds[i]
             
-            acronyms, long_forms = self.get_prediction_index(ans_labels, tokens['offset_mapping'])
+            acronyms, long_forms = self.get_prediction_index(ans_labels, tokens['offset_mapping'][:512])
             output_dict['acronyms'] = acronyms
             output_dict['long-forms'] = long_forms
             output_dict['ID'] = str(i + 1)
@@ -310,8 +310,8 @@ class Instructor():
             custom_print("Loss on Train Data ...  ", accumulated_loss)
 
 
-            # custom_print("Running Eval on Training Data after Epoch ............................., ", str(epoch + 1))
-            # trainP, trainR, trainF = self.evaluate_classifier(self.preprocessor.train_dataloader, model, self.preprocessor.train_dataset_raw , self.preprocessor.tokenizer, self.train_data_path )
+            custom_print("Running Eval on Training Data after Epoch ............................., ", str(epoch + 1))
+            trainP, trainR, trainF = self.evaluate_classifier(self.preprocessor.train_dataloader, model, self.preprocessor.train_dataset_raw , self.preprocessor.tokenizer, self.train_data_path )
 
             custom_print("Running Eval on Validation Data after Epoch ............................., ", str(epoch + 1))
             evalP, evalR, evalF = self.evaluate_classifier(self.preprocessor.eval_dataloader, model, self.preprocessor.eval_dataset_raw , self.preprocessor.tokenizer, self.eval_data_path )
