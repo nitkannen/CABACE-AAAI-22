@@ -360,7 +360,7 @@ if __name__ == "__main__":
     parser.add_argument('--log_file', type = str, default = 'training.log')
     parser.add_argument('--max_word_len', type = int, default = 16) ### when model_id = 1
     parser.add_argument('--cnn_filter_size', type = int, default = 4) ## when model_id = 1
-    parser.add_argument('--val_output_file', type = int, default = 'val_output.json')
+    parser.add_argument('--val_output_file', type = str, default = 'val_output.json')
 
     args = parser.parse_args()
 
