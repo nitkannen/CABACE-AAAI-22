@@ -63,7 +63,7 @@ def custom_print(*msg):
 class Instructor():
 
     def __init__(self, tokenizer_checkpoint, train_data_path, eval_data_path, batch_size, val_output_file):
-
+    
         self.preprocessor = Preprocessor(tokenizer_checkpoint, train_data_path, eval_data_path, batch_size)
 
         self.train_data_path = train_data_path
@@ -289,11 +289,23 @@ class Instructor():
             for step, batch in tqdm.tqdm(enumerate(self.preprocessor.train_dataloader), total=len(self.preprocessor.train_dataloader)):
             
             #   print("Starting step :------------------", step)
+                if lambda_mask_loss != 0:
+                    n_mask = 0
+                    n_tot_tokens = 0
+                    for i in range(len(batch['input_ids'])):
+                        for j, label_id in enumerate(batch['input_ids'][i]):
+                            n_tot_tokens += 1
+                            if label_id == 0:
+                                continue
+                            if np.random.random() < mask_rate :
+                                batch['input_ids'][i][j] = 103
+                                n_mask += 1
+
                 b_input_ids=batch['input_ids'].long().to('cuda')
                 b_attn_mask=batch['attention_mask'].long().to('cuda')
                 b_labels = batch['labels'].long().to('cuda')
 
-                outputs = model(input_ids = b_input_ids, attn_mask = b_attn_mask, labels = b_labels)
+                outputs = model(input_ids = b_input_ids, attn_mask = b_attn_mask, labels = b_labels, lambda_max_loss = lambda_max_loss, lambda_mask_loss = lambda_mask_loss)
 
                 loss = outputs[1]
 
@@ -361,6 +373,10 @@ if __name__ == "__main__":
     parser.add_argument('--max_word_len', type = int, default = 16) ### when model_id = 1
     parser.add_argument('--cnn_filter_size', type = int, default = 4) ## when model_id = 1
     parser.add_argument('--val_output_file', type = str, default = 'val_output.json')
+    parser.add_argument('--lambda_max_loss', type = float, default=2.0)
+    parser.add_argument('--lambda_mask_loss', type = float, default = 1.0)
+    parser.add_argument('--mask_rate', type = float, default = 0.15)
+
 
     args = parser.parse_args()
 
@@ -374,6 +390,9 @@ if __name__ == "__main__":
     dataset_folder = args.dataset
     log_file = args.log_file
     val_output_file = args.val_output_file
+    lambda_max_loss = args.lambda_max_loss
+    lambda_mask_loss = args.lambda_mask_loss
+    mask_rate = args.mask_rate
 
     train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
     eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
