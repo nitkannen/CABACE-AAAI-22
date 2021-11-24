@@ -210,13 +210,13 @@ class Instructor():
         
 
 
-        with open(os.path.join(trg_folder, f'{self.val_output_file}.json'), 'w') as f:
+        with open(os.path.join(trg_folder, self.val_output_file), 'w') as f:
             json.dump(val_predictions, f, indent = 4)
 
         with open(eval_data_path) as file:
             gold = dict([(d['ID'], {'acronyms':d['acronyms'],'long-forms':d['long-forms']}) for d in json.load(file)])
         
-        with open(os.path.join(trg_folder, 'val_output.json')) as file:
+        with open(os.path.join(trg_folder, self.val_output_file)) as file:
             pred = dict([(d['ID'], {'acronyms':d['acronyms'],'long-forms':d['long-forms']}) for d in json.load(file)])
         
         pred = [pred[k] for k,v in gold.items()]
@@ -322,8 +322,8 @@ class Instructor():
             custom_print("Loss on Train Data ...  ", accumulated_loss)
 
 
-            custom_print("Running Eval on Training Data after Epoch ............................., ", str(epoch + 1))
-            trainP, trainR, trainF = self.evaluate_classifier(self.preprocessor.train_dataloader, model, self.preprocessor.train_dataset_raw , self.preprocessor.tokenizer, self.train_data_path )
+            # custom_print("Running Eval on Training Data after Epoch ............................., ", str(epoch + 1))
+            # trainP, trainR, trainF = self.evaluate_classifier(self.preprocessor.train_dataloader, model, self.preprocessor.train_dataset_raw , self.preprocessor.tokenizer, self.train_data_path )
 
             custom_print("Running Eval on Validation Data after Epoch ............................., ", str(epoch + 1))
             evalP, evalR, evalF = self.evaluate_classifier(self.preprocessor.eval_dataloader, model, self.preprocessor.eval_dataset_raw , self.preprocessor.tokenizer, self.eval_data_path )
