@@ -369,6 +369,10 @@ if __name__ == "__main__":
     parser.add_argument('--tokenizer_checkpoint', type = str, default = '') ##needed
     parser.add_argument('--model_checkpoint', type = str, default='') ##needed
     parser.add_argument('--dataset', type = str, default = 'english/legal') ##needed
+
+    parser.add_argument('--source_dataset', type=str, default='None')
+    parser.add_argument('--target_dataset', type=str, default='None')
+    
     parser.add_argument('--log_file', type = str, default = 'training.log')
     parser.add_argument('--max_word_len', type = int, default = 16) ### when model_id = 1
     parser.add_argument('--cnn_filter_size', type = int, default = 4) ## when model_id = 1
@@ -388,16 +392,26 @@ if __name__ == "__main__":
     model_checkpoint = args.model_checkpoint
     bs = args.batch_size
     dataset_folder = args.dataset
+    source_dataset_folder = args.source_dataset
+    target_dataset_folder = args.target_dataset
     log_file = args.log_file
     val_output_file = args.val_output_file
     lambda_max_loss = args.lambda_max_loss
     lambda_mask_loss = args.lambda_mask_loss
     mask_rate = args.mask_rate
 
-    train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
-    eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
+    if source_dataset_folder == 'None' and target_dataset_folder == 'None':
+        train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
+        eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
+    else:
+        train_data_path = os.path.join(src_folder, source_dataset_folder, 'train.json')
+        eval_data_path = os.path.join(src_folder, target_dataset_folder, 'dev.json')
 
     ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs, val_output_file)
+
+    if source_dataset_folder != 'None' and target_dataset_folder != 'None':
+        custom_print('\nSource Dataset: ', source_dataset_folder)
+        custom_print('\nTarget Dataset: ', target_dataset_folder, '\n')
 
     logger = open(os.path.join(trg_folder, log_file), 'w')
     custom_print(sys.argv)
