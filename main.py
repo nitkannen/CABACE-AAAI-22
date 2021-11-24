@@ -372,7 +372,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--source_dataset', type=str, default='None')
     parser.add_argument('--target_dataset', type=str, default='None')
-    
+
     parser.add_argument('--log_file', type = str, default = 'training.log')
     parser.add_argument('--max_word_len', type = int, default = 16) ### when model_id = 1
     parser.add_argument('--cnn_filter_size', type = int, default = 4) ## when model_id = 1
@@ -409,11 +409,10 @@ if __name__ == "__main__":
 
     ins = Instructor(tokenizer_checkpoint, train_data_path, eval_data_path, bs, val_output_file)
 
+    logger = open(os.path.join(trg_folder, log_file), 'w')
     if source_dataset_folder != 'None' and target_dataset_folder != 'None':
         custom_print('\nSource Dataset: ', source_dataset_folder)
         custom_print('\nTarget Dataset: ', target_dataset_folder, '\n')
-
-    logger = open(os.path.join(trg_folder, log_file), 'w')
     custom_print(sys.argv)
     custom_print('\n')
 
