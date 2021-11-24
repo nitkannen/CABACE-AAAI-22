@@ -400,6 +400,9 @@ if __name__ == "__main__":
     lambda_mask_loss = args.lambda_mask_loss
     mask_rate = args.mask_rate
 
+    use_cuda = torch.cuda.is_available()
+    random_seed(seed_value, use_cuda)
+
     if source_dataset_folder == 'None' and target_dataset_folder == 'None':
         train_data_path = os.path.join(src_folder, dataset_folder, 'train.json')
         eval_data_path = os.path.join(src_folder, dataset_folder, 'dev.json' )
@@ -425,10 +428,6 @@ if __name__ == "__main__":
     model = ins.get_model(model_id)
     model = model.to('cuda')
     
-    use_cuda = torch.cuda.is_available()
-    
-    random_seed(seed_value, use_cuda)
-
     
     optimizer, scheduler = ins.get_optimizer_scheduler(model, ins.preprocessor.train_dataloader)
 
