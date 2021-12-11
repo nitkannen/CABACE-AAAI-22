@@ -1,5 +1,5 @@
 # BacKGProp-AAAI-22
-Code and Pre-Processed data for our paper in **AAAI** SDU 2022 titled: **CABACE: Injecting Character Sequence Information and Domain Knowledge for Enhanced Acronym Extraction **.
+Code and Pre-Processed data for our paper in **AAAI** SDU 2022 titled: **CABACE: Injecting Character Sequence Information and Domain Knowledge for Enhanced Acronym Extraction**
 
 To create BIO tags, use the following  example command
 
@@ -13,7 +13,6 @@ We support different model architectures to solve AE, and they can be identified
 * Seq2Seq
 * Attention staged prediction
 
-(More models to be added)
 
 To run the code on English Legal dataset using simple BERT for Sequence labelling(model_id = 0) use:
 
