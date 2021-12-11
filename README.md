@@ -1,5 +1,5 @@
 # BacKGProp-AAAI-22
-Code and Pre-Processed data for Acronym Extraction Task in SDU Worskshop
+Code and Pre-Processed data for our paper in **AAAI** SDU 2022 titled: **"CABACE: Injecting Character Sequence Information and Domain Knowledge for Enhanced Acronym Extraction" **.
 
 To create BIO tags, use the following  example command
 
