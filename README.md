@@ -9,23 +9,24 @@ We support different model architectures to solve AE, and they can be identified
 
 * SimpleBert - 0
 * CharacterTransformBert - 1
-* Masking and augmented Loss
-* Seq2Seq
-* Attention staged prediction
-
 
 To run the code on English Legal dataset using simple BERT for Sequence labelling(model_id = 0) use:
 
 ```
-python main.py --src_folder data/
-               --trg_folder logs/
-               --model_id 0
-               --seed_value 42
-               --batch_size 8
-               --epoch 6
-               --tokenizer_checkpoint bert-base-cased
-               --model_checkpoint bert-base-cased
-               --dataset english/legal
+python main.py --src_folder data \
+               --trg_folder logs \
+               --model_id 0 \
+               --seed_value 42 \
+               --batch_size 8 \
+               --epoch 6 \
+               --tokenizer_checkpoint bert-base-cased \
+               --model_checkpoint bert-base-cased \
+               --dataset english/legal \
+               --lambda_max_loss 1.0 \
+               --lambda_mask_loss 1.0 \
+               --mask_rate 0.1 \
+               --cnn_filter_size 5 \
+               --max_word_len 16
      
  ```
  
@@ -41,18 +42,23 @@ python main.py --src_folder data/
  * 2) Now use the command to run code:
 
 ```
-python main.py --src_folder data/
-               --trg_folder logs/
-               --model_id 1
-               --seed_value 42
-               --batch_size 8
-               --epoch 6
-               --tokenizer_checkpoint bert-base-cased
-               --model_checkpoint bert-base-cased
-               --dataset english/legal
+python main.py --src_folder data \
+               --trg_folder logs \
+               --model_id 1 \
+               --seed_value 42 \
+               --batch_size 8 \
+               --epoch 6 \
+               --tokenizer_checkpoint bert-base-cased \
+               --model_checkpoint bert-base-cased \
+               --dataset english/legal \
+               --lambda_max_loss 1.0 \
+               --lambda_mask_loss 1.0 \
+               --mask_rate 0.1 \
+               --cnn_filter_size 5 \
                --max_word_len 16
-               --cnn_filter_size 4
      
  ```
+ 
+ The notebook for Sequence to Sequence model is included.
 
 
