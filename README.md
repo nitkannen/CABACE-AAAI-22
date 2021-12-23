@@ -58,7 +58,29 @@ python main.py --src_folder data \
                --max_word_len 16
      
  ```
+ ### SequenceToSequence Model
  
  The notebook for Sequence to Sequence model is included.
-
+ 
+ ### Language Modeling
+ 
+ ```
+ python run_LM.py --train_data_file train.txt
+                  --output_dir models/
+                  --model_type bert
+                  --eval_data_file eval.txt
+                  --model_name_or_path bert-base-uncased
+                  --mlm
+                  --mlm_probability 0.15
+                  --tokenizer_name bert-base-uncased
+                  --per_gpu_train_batch_size 4
+                  --block_size 512
+                  --num_train_epochs 6
+                  --save_total_limit 5
+ ```
+ Add `--should_continue` to continue from checkpoint
+ 
+ ### Scraping code
+ 
+ The Scraping code is also included in `scraping/` which includes the English Scientific scraping code from ArXiV anf French scraping code from Wikipedia. The french code can be edited by replacing `fr` in links with the corresponding language code in wikipedia. Also the link of the initial page where scraping starts shall be changed to any similar page (on topics like Neural Networks, Artificial Intelligence or any other scientific topic with a lot of acronyms) in the other language.
 
