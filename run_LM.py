@@ -63,11 +63,10 @@ drive.mount("/content/gdrive")
 
 """
 
-BASE_PATH = '/content/gdrive/MyDrive/SDU AAAI'
 
 """## Set up logger to keep log"""
 
-logging.basicConfig(filename=f'{BASE_PATH}/log_EngSci.txt', level=logging.DEBUG)
+# logging.basicConfig(filename=f'{BASE_PATH}/log_EngSci.txt', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 """## Function for dataset that has a large body of text"""
