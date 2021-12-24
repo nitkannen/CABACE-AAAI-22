@@ -1,5 +1,33 @@
 # BacKGProp-AAAI-22
-Code and Pre-Processed data for our paper in SDU **AAAI 2022** titled: **CABACE: Injecting Character Sequence Information and Domain Knowledge for Enhanced Acronym Extraction**
+Code and Pre-Processed data for our paper in SDU **AAAI 2022** titled: **CABACE: Injecting Character Sequence Information and Domain Knowledge for Enhanced Acronym and Long-Form Extraction**
+
+## Backdrop
+Acronyms and long-forms are commonly found in research
+documents, more so in documents from scientific and legal domains. Many acronyms used in such documents are
+domain-specific, and are very rarely found in normal text
+corpora. Owing to this, transformer-based NLP models often detect OOV (Out of Vocabulary) for acronym tokens, especially for non-English languages, and their performance
+suffers while linking acronyms to their long forms during
+extraction. Moreover, pre-trained transformer models like
+BERT are not specialized to handle scientific and legal documents. With these points being the overarching motivation
+behind this work, we propose a novel framework CABACE:
+Character-Aware BERT for ACronym Extraction, which
+takes into account character sequences in text, and is adapted
+to scientific and legal domains by masked language modelling. We further use an objective with an augmented loss
+function, adding max loss and mask loss terms to the standard cross-entropy loss for training CABACE. We further
+leverage pseudo labelling and adversarial data generation
+to improve the generalizability of the framework. Experimental results prove the superiority of the proposed framework in comparison to various baselines. Additionally, we
+show that the proposed framework is better suited than baseline models for zero-shot generalization to non-English languages, thus reinforcing the effectiveness of our approach.
+Our team BacKGProp secured the highest scores on the
+French dataset, second-highest on Danish and Vietnamese,
+and third-highest in English-Legal dataset on the global
+leaderboard for the acronym extraction (AE) shared task at
+SDU AAAI-22.
+<p align="center">
+
+![alt text](https://github.com/nitkannen/BacKGProp-AAAI-22/blob/main/images/AAAI-Figure.jpg?raw=true)
+ Figure: The CABACE Architecture
+  
+ </p>
 
 To create BIO tags, use the following  example command
 
